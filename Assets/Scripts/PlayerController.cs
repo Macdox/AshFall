@@ -4,16 +4,19 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float speed = 5f;
+    [SerializeField] private float jumpForce = 5f;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Vector2 groundCheckSize = new Vector2(1f, 1f);
+    [SerializeField] private float coyoteTimeMax = 0.15f;
+    [SerializeField] private float jumpBufferMax = 0.1f;
+
+
+    private float coyoteTimeCounter;
+    private float jumpBufferCounter;
 
     private float horizontal;
     private bool isGrounded;
-    private bool jumpRequested;
-
-
-
 
     void Awake()
     {
@@ -27,12 +30,13 @@ public class PlayerController : MonoBehaviour
             groundLayer = LayerMask.GetMask("Ground");
         }
     }
+
     void Update()
     {
         horizontal = Input.GetAxisRaw("Horizontal");
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            jumpRequested = true;
+            jumpBufferCounter = jumpBufferMax;
         }
     }
     void FixedUpdate()
@@ -42,10 +46,20 @@ public class PlayerController : MonoBehaviour
             groundCheckSize,
             0f,
             groundLayer) != null;
+    
+        if (isGrounded)
+        {
+            coyoteTimeCounter = coyoteTimeMax;
+        }
+        else
+        {
+            coyoteTimeCounter -= Time.fixedDeltaTime;
+        }
+
+        jumpBufferCounter -= Time.fixedDeltaTime;
 
         Jump();
         Move();
-        
     }
 
     private void Move()
@@ -54,17 +68,14 @@ public class PlayerController : MonoBehaviour
         transform.Translate(movement * speed * Time.fixedDeltaTime);
     }
 
-    private void Jump(){
-        if (jumpRequested && isGrounded)
+    private void Jump()
+    {
+        if (jumpBufferCounter > 0 && coyoteTimeCounter > 0)
         {
-            GetComponent<Rigidbody2D>().AddForce(Vector2.up * 5f, ForceMode2D.Impulse);
+            GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            jumpBufferCounter = 0f;
+            coyoteTimeCounter = 0f;
         }
-        else if (jumpRequested && !isGrounded)
-        {
-            Debug.Log("Player is not grounded and cannot jump.");
-        }
-
-        jumpRequested = false;
     }
     private Vector2 GetGroundCheckPosition()
     {

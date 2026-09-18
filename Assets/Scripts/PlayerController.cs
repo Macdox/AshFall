@@ -3,13 +3,19 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    
     [SerializeField] private float speed = 5f;
     [SerializeField] private float jumpForce = 5f;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private Vector2 groundCheckSize = new Vector2(1f, 1f);
+    [SerializeField] private Vector2 groundCheckSize = new Vector2(0.8f, 0.2f);
     [SerializeField] private float coyoteTimeMax = 0.15f;
     [SerializeField] private float jumpBufferMax = 0.1f;
+
+
+    private Rigidbody2D rb;
+
+
 
 
     private float coyoteTimeCounter;
@@ -20,6 +26,9 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
+        rb = GetComponent<Rigidbody2D>();
+
+
         if (groundCheck == null)
         {
             groundCheck = transform.Find("GroundCheck");
@@ -64,15 +73,14 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        Vector3 movement = new Vector3(horizontal, 0f, 0f);
-        transform.Translate(movement * speed * Time.fixedDeltaTime);
+        rb.linearVelocity = new Vector2(horizontal * speed, rb.linearVelocity.y);
     }
 
     private void Jump()
     {
         if (jumpBufferCounter > 0 && coyoteTimeCounter > 0)
         {
-            GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             jumpBufferCounter = 0f;
             coyoteTimeCounter = 0f;
         }
@@ -81,14 +89,14 @@ public class PlayerController : MonoBehaviour
     {
         if (groundCheck != null)
         {
-            Debug.Log("Using groundCheck position for ground detection.");
+            // Debug.Log("Using groundCheck position for ground detection.");
             return groundCheck.position;
         }
 
         Collider2D playerCollider = GetComponent<Collider2D>();
         if (playerCollider != null)
         {
-            Debug.Log("Using player collider bounds for ground detection.");
+            // Debug.Log("Using player collider bounds for ground detection.");
             return new Vector2(playerCollider.bounds.center.x, playerCollider.bounds.min.y);
         }
 

@@ -1,10 +1,10 @@
 # Ashfall
 
 A short, polished 2D combat platformer built in Unity (C#) as a solo portfolio project. Cut through a collapsing fortress, fight through two enemy types, and take down a 2-phase boss before the throne room falls.
-
+<!-- 
 **[Play it on itch.io →](#)** <!-- replace # with your itch.io page link -->
 
-![Gameplay Screenshot](#) <!-- replace with an actual screenshot or gif path once you have one -->
+![Gameplay Screenshot](#) replace with an actual screenshot or gif path once you have one -->
 
 ---
 
@@ -87,4 +87,4 @@ Full design and architecture decisions are documented in:
 
 ---
 
-Built solo by [Your Name] as a portfolio project. Feedback welcome!
+Built solo by [@Macdox] as a portfolio project. Feedback welcome!

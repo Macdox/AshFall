@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerHealth : MonoBehaviour,IDamageable
 {
  
-    
+
     private float maxHealth = 100f;
     private float currentHealth;
     private bool isInvincible;

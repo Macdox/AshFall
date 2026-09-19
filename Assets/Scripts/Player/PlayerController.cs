@@ -35,17 +35,19 @@ public class PlayerController : MonoBehaviour
 
     private float horizontal;
     private int facingDirection = 1;
+    public int FacingDirection => facingDirection;
     private int dashDirection = 1;
-    private bool isInvincible;
     private float defaultGravity;
     
     private bool isGrounded;
     private bool isDashing;
     private bool hasAirDashed;
+    private PlayerHealth playerHealth;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        playerHealth = GetComponent<PlayerHealth>();
         defaultGravity = rb.gravityScale;
 
         if (groundCheck == null)
@@ -80,7 +82,7 @@ public class PlayerController : MonoBehaviour
             }
 
             isDashing = true; 
-            isInvincible = true;
+            playerHealth?.SetExternalInvincibility(true);
             dashDirection = facingDirection;
             dashTimer = dashDuration; 
             dashCooldownTimer = dashCooldown;
@@ -120,14 +122,18 @@ public class PlayerController : MonoBehaviour
             if (dashTimer <= 0f)
             {
                 isDashing = false;
-                isInvincible = false;
+                playerHealth?.SetExternalInvincibility(false);
                 rb.gravityScale = defaultGravity;
             }
         }
         else
         {
-            Jump();
-            Move();
+           
+            if (playerHealth == null || !playerHealth.IsKnockedBack)
+            {
+                Jump();
+                Move();
+            }
         }
     }
 

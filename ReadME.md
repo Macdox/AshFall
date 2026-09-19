@@ -2,7 +2,7 @@
 
 A short, polished 2D combat platformer built in Unity (C#) as a solo portfolio project. Cut through a collapsing fortress, fight through two enemy types, and take down a 2-phase boss before the throne room falls.
 
-**[itch.io →](https://mandox.itch.io)**
+**[itch.io →](<[text](https://mandox.itch.io)>)**
 
 ![Gameplay Screenshot](./banner.png)
 

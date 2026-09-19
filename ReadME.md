@@ -1,10 +1,10 @@
 # Ashfall
 
 A short, polished 2D combat platformer built in Unity (C#) as a solo portfolio project. Cut through a collapsing fortress, fight through two enemy types, and take down a 2-phase boss before the throne room falls.
-<!-- 
-**[Play it on itch.io →](#)** <!-- replace # with your itch.io page link -->
 
-![Gameplay Screenshot](#) replace with an actual screenshot or gif path once you have one -->
+**[itch.io →](https://mandox.itch.io)**
+
+![Gameplay Screenshot](./banner.png)
 
 ---
 
@@ -24,12 +24,12 @@ Ashfall was built in ~3 days with a deliberately small scope, prioritizing game 
 
 ## Controls
 
-| Action | Key |
-|---|---|
-| Move | A/D or Left/Right Arrow |
-| Jump | Space |
-| Dash | Shift |
-| Attack | Left Mouse / J |
+| Action | Key                     |
+| ------ | ----------------------- |
+| Move   | A/D or Left/Right Arrow |
+| Jump   | Space                   |
+| Dash   | Shift                   |
+| Attack | Left Mouse / J          |
 
 <!-- Update this table to match your actual final input bindings -->
 
@@ -69,6 +69,7 @@ Assets/_Project/
 ## Design & Technical Docs
 
 Full design and architecture decisions are documented in:
+
 - [`Ashfall_GDD.md`](./Ashfall_GDD.md) — Game Design Document
 - [`Ashfall_TDD.md`](./Ashfall_TDD.md) — Technical Design Document
 

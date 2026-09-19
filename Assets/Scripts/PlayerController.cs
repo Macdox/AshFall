@@ -4,13 +4,25 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     
-    [SerializeField] private float speed = 5f;
-    [SerializeField] private float jumpForce = 5f;
+    
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Vector2 groundCheckSize = new Vector2(0.8f, 0.2f);
+
+    
     [SerializeField] private float coyoteTimeMax = 0.15f;
     [SerializeField] private float jumpBufferMax = 0.1f;
+    [SerializeField] private float speed = 5f;
+    [SerializeField] private float jumpForce = 5f;
+    [SerializeField] private float dashSpeed = 10f;
+    [SerializeField] private float dashDuration = 0.5f;
+    [SerializeField] private float dashCooldown = 1f;
+
+    [SerializeField]private float dashTimer;
+    [SerializeField]private float dashCooldownTimer;
+    
+    
+    
 
 
     private Rigidbody2D rb;
@@ -22,12 +34,19 @@ public class PlayerController : MonoBehaviour
     private float jumpBufferCounter;
 
     private float horizontal;
+    private int facingDirection = 1;
+    private int dashDirection = 1;
+    private bool isInvincible;
+    private float defaultGravity;
+    
     private bool isGrounded;
+    private bool isDashing;
+    private bool hasAirDashed;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-
+        defaultGravity = rb.gravityScale;
 
         if (groundCheck == null)
         {
@@ -43,9 +62,29 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         horizontal = Input.GetAxisRaw("Horizontal");
+        if (horizontal != 0)
+        {
+            facingDirection = (int)Mathf.Sign(horizontal);
+        }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             jumpBufferCounter = jumpBufferMax;
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing && dashCooldownTimer <= 0f && (isGrounded || !hasAirDashed))
+        {
+            if (!isGrounded)
+            {
+                hasAirDashed = true;
+            }
+
+            isDashing = true; 
+            isInvincible = true;
+            dashDirection = facingDirection;
+            dashTimer = dashDuration; 
+            dashCooldownTimer = dashCooldown;
+            rb.gravityScale = 0f;
         }
     }
     void FixedUpdate()
@@ -59,6 +98,7 @@ public class PlayerController : MonoBehaviour
         if (isGrounded)
         {
             coyoteTimeCounter = coyoteTimeMax;
+            hasAirDashed = false;
         }
         else
         {
@@ -67,8 +107,28 @@ public class PlayerController : MonoBehaviour
 
         jumpBufferCounter -= Time.fixedDeltaTime;
 
-        Jump();
-        Move();
+        if (dashCooldownTimer > 0)
+        {
+            dashCooldownTimer -= Time.fixedDeltaTime;
+        }
+
+        if (isDashing)
+        {
+            rb.linearVelocity = new Vector2(dashDirection * dashSpeed, 0f);
+            dashTimer -= Time.fixedDeltaTime;
+            
+            if (dashTimer <= 0f)
+            {
+                isDashing = false;
+                isInvincible = false;
+                rb.gravityScale = defaultGravity;
+            }
+        }
+        else
+        {
+            Jump();
+            Move();
+        }
     }
 
     private void Move()
@@ -85,6 +145,8 @@ public class PlayerController : MonoBehaviour
             coyoteTimeCounter = 0f;
         }
     }
+
+
     private Vector2 GetGroundCheckPosition()
     {
         if (groundCheck != null)

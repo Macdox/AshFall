@@ -8,13 +8,20 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private int attackDamage = 20;
     [SerializeField] private float attackCooldown = 0.5f;
 
+
+    [SerializeField] private Animator attackEffectAnimator;
+    [SerializeField] private Transform attackEffectTransform;
+
+    [SerializeField] private Animator anim;
+
     private float nextAttackTime = 0f;
     private PlayerController playerController;
 
     void Awake()
     {
         playerController = GetComponent<PlayerController>();
-        
+        anim = GetComponent<Animator>();
+
         // If enemyLayers is not set in inspector, default to hitting everything
         // (Useful for initial testing before proper layers are set up)
         if (enemyLayers.value == 0)
@@ -39,7 +46,12 @@ public class PlayerCombat : MonoBehaviour
     {
         // Calculate hit position based on facing direction
         Vector2 attackPos = (Vector2)transform.position + new Vector2(playerController.FacingDirection * 0.75f, 0f);
-        
+        attackEffectTransform.GetComponent<SpriteRenderer>().flipX = playerController.FacingDirection < 0;
+        attackEffectTransform.position = attackPos;
+        attackEffectAnimator.Play("Attack1_Effect", 0, 0f);
+        anim.SetTrigger("AttackTrigger");
+        attackEffectTransform.GetComponent<SpriteRenderer>().enabled = true;
+
         // Use OverlapCircleAll to hit multiple targets in range
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPos, attackRange, enemyLayers);
 

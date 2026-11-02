@@ -20,9 +20,12 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]private float dashTimer;
     [SerializeField]private float dashCooldownTimer;
-    
-    
-    
+    [SerializeField] private TrailRenderer trailRenderer;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Animator Anim;
+
+
+
 
 
     private Rigidbody2D rb;
@@ -48,7 +51,15 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         playerHealth = GetComponent<PlayerHealth>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        Anim = GetComponent<Animator>();
         defaultGravity = rb.gravityScale;
+
+        if (trailRenderer == null)
+        {
+            trailRenderer = GetComponent<TrailRenderer>();
+        }
+        trailRenderer.emitting = false;
 
         if (groundCheck == null)
         {
@@ -67,6 +78,7 @@ public class PlayerController : MonoBehaviour
         if (horizontal != 0)
         {
             facingDirection = (int)Mathf.Sign(horizontal);
+            spriteRenderer.flipX = facingDirection < 0;
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -81,7 +93,8 @@ public class PlayerController : MonoBehaviour
                 hasAirDashed = true;
             }
 
-            isDashing = true; 
+            isDashing = true;
+            trailRenderer.emitting = true;
             playerHealth?.SetExternalInvincibility(true);
             dashDirection = facingDirection;
             dashTimer = dashDuration; 
@@ -91,12 +104,17 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
+        if (playerHealth != null && playerHealth.IsDead) return;
         isGrounded = Physics2D.OverlapBox(
             GetGroundCheckPosition(),
             groundCheckSize,
             0f,
             groundLayer) != null;
-    
+        Anim.SetBool("IsGrounded", isGrounded);
+        Anim.SetBool("IsDashing", isDashing);
+        Anim.SetBool("IsHurt", playerHealth != null && playerHealth.IsKnockedBack);
+        Anim.SetFloat("VerticalVelocity", rb.linearVelocity.y);
+
         if (isGrounded)
         {
             coyoteTimeCounter = coyoteTimeMax;
@@ -123,6 +141,7 @@ public class PlayerController : MonoBehaviour
             {
                 isDashing = false;
                 playerHealth?.SetExternalInvincibility(false);
+                trailRenderer.emitting = false;
                 rb.gravityScale = defaultGravity;
             }
         }
@@ -132,7 +151,16 @@ public class PlayerController : MonoBehaviour
             if (playerHealth == null || !playerHealth.IsKnockedBack)
             {
                 Jump();
-                Move();
+                if (IsLanding())
+                {
+                    // plant the feet: stop horizontal movement, keep vertical velocity
+                    rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+                    Anim.SetFloat("Speed", 0f);
+                }
+                else
+                {
+                    Move();
+                }
             }
         }
     }
@@ -140,6 +168,7 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         rb.linearVelocity = new Vector2(horizontal * speed, rb.linearVelocity.y);
+        Anim.SetFloat("Speed", Mathf.Abs(horizontal));
     }
 
     private void Jump()
@@ -152,6 +181,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private bool IsLanding()
+    {
+        return Anim.GetCurrentAnimatorStateInfo(0).IsName("Player_Jump_Land");
+    }
 
     private Vector2 GetGroundCheckPosition()
     {

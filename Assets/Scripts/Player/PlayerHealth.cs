@@ -10,19 +10,23 @@ public class PlayerHealth : MonoBehaviour,IDamageable
     private float currentHealth;
     private bool isInvincible;
     private bool isDashInvincible;
+    public bool IsDead { get; private set; }
     private float i_frameTime = 0.5f;
     private float i_frameTimer;
 
     public bool IsKnockedBack { get; private set; }
     private float knockbackDuration = 0.5f;
     private float knockbackTimer;
-    
-    
+
+    [SerializeField] private Animator anim;
+
+
     private Rigidbody2D rb;
     
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
         currentHealth = maxHealth;
     }
     
@@ -73,6 +77,8 @@ public class PlayerHealth : MonoBehaviour,IDamageable
     
     private void Die()
     {
+        IsDead = true;
         Debug.Log("Player died");
+        anim.SetTrigger("DeadTrigger");
     }
 }

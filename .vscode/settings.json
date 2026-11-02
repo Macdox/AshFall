@@ -1,12 +1,12 @@
 {
     "dotnet.defaultSolution": "AshFall.sln",
     "dotnet.dotnetPath": "C:/Program Files/dotnet/dotnet.exe",
-    "dotrush.roslyn.dotnetSdkDirectory": "C:/Program Files/dotnet/sdk/9.0.301",
+    "dotrush.roslyn.dotnetSdkDirectory": "C:/Program Files/dotnet/sdk/10.0.403",
     "dotrush.msbuildProperties": {
         "DefineConstants": "UNITY_EDITOR"
     },
     "dotrush.roslyn.projectOrSolutionFiles": [
-        "C:/Users/maddo/Downloads/GameDevelopment/AshFall/AshFall.sln"
+        "D:/Tejas major project/AshFall/AshFall.sln"
     ],
     "dotrush.roslyn.restoreProjectsBeforeLoading": false,
     "files.exclude": {

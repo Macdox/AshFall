@@ -36,28 +36,27 @@ public class PlayerCombat : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.J) || Input.GetMouseButtonDown(0))
             {
-                Attack();
+                anim.SetTrigger("AttackTrigger");   // only starts the body animation
                 nextAttackTime = Time.time + attackCooldown;
             }
         }
     }
 
-    void Attack()
+    // Called by an Animation Event on the strike frame
+    public void DealAttack()
     {
-        // Calculate hit position based on facing direction
         Vector2 attackPos = (Vector2)transform.position + new Vector2(playerController.FacingDirection * 0.75f, 0f);
+
+        // slash effect
         attackEffectTransform.GetComponent<SpriteRenderer>().flipX = playerController.FacingDirection < 0;
         attackEffectTransform.position = attackPos;
-        attackEffectAnimator.Play("Attack1_Effect", 0, 0f);
-        anim.SetTrigger("AttackTrigger");
         attackEffectTransform.GetComponent<SpriteRenderer>().enabled = true;
+        attackEffectAnimator.Play("Attack1_Effect", 0, 0f);
 
-        // Use OverlapCircleAll to hit multiple targets in range
+        // hit detection (same code as before)
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPos, attackRange, enemyLayers);
-
         foreach (Collider2D enemy in hitEnemies)
         {
-            // Prevent hitting ourselves
             if (enemy.gameObject == gameObject) continue;
 
             IDamageable damageable = enemy.GetComponent<IDamageable>();
@@ -65,7 +64,6 @@ public class PlayerCombat : MonoBehaviour
             {
                 Vector2 knockbackDir = new Vector2(playerController.FacingDirection, 0f).normalized;
                 damageable.TakeDamage(attackDamage, knockbackDir);
-                Debug.Log("Dealt " + attackDamage + " damage to " + enemy.name);
             }
         }
     }

@@ -13,12 +13,13 @@ public class PlayerHealth : MonoBehaviour,IDamageable
     public bool IsDead { get; private set; }
     private float i_frameTime = 0.5f;
     private float i_frameTimer;
-
+    [SerializeField] private float deadColliderGap = 0.3f;   // tune by eye
     public bool IsKnockedBack { get; private set; }
     private float knockbackDuration = 0.5f;
     private float knockbackTimer;
 
     [SerializeField] private Animator anim;
+
 
 
     private Rigidbody2D rb;
@@ -77,8 +78,13 @@ public class PlayerHealth : MonoBehaviour,IDamageable
     
     private void Die()
     {
+        if (IsDead) return;
         IsDead = true;
-        Debug.Log("Player died");
         anim.SetTrigger("DeadTrigger");
+        rb.linearVelocity = Vector2.zero;
+
+        var col = GetComponent<BoxCollider2D>();   // Capsule has the same size/offset fields
+        col.size = new Vector2(col.size.x, col.size.y - deadColliderGap);
+        col.offset = new Vector2(col.offset.x, col.offset.y + deadColliderGap / 2f);
     }
 }

@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7409a4685c4c5c947a3c2cdf21e026bc, type: 3}
-  m_Name: OrcData
+  m_Name: Orc_shaman
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  maxHealth: 40
+  maxHealth: 100
   patrolSpeed: 1
   chaseSpeed: 2
   detectionRange: 5
   loseInterestRange: 8
-  attackRange: 1.2
+  attackRange: 1.65
   attackWindup: 0.3
-  attackRecovery: 0.4
-  attackDamage: 10
-  hurtDuration: 0.25
+  attackRecovery: 0.3
+  attackDamage: 14
+  hurtDuration: 0.2

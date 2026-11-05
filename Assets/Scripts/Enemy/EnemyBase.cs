@@ -251,6 +251,7 @@ public abstract class EnemyBase : MonoBehaviour
         }
     }
 
+
     // ------------------------------------------------------------------
     // Default state behaviours (override in children when needed)
     // ------------------------------------------------------------------
@@ -318,8 +319,7 @@ public abstract class EnemyBase : MonoBehaviour
             if (attackTimer <= 0f)
             {
                 PerformStrike();
-                if (attackEffect != null)
-                    attackEffect.Play(GetEffectPosition(), FacingSign);
+                PlayAttackEffect();
                 attackPhase = AttackPhase.Recovery;
                 attackTimer = data.attackRecovery;
             }
@@ -381,7 +381,13 @@ public abstract class EnemyBase : MonoBehaviour
         return (Vector2)transform.position + new Vector2(FacingSign * effectOffset.x, effectOffset.y);
     }
 
-
+    protected virtual void PlayAttackEffect()
+    {
+        if (attackEffect != null)
+        {
+            attackEffect.Play(GetEffectPosition(), FacingSign);
+        }
+    }
     // ------------------------------------------------------------------
     // Debug
     // ------------------------------------------------------------------

@@ -314,7 +314,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02d7f03a27d908e4b9ed75d3fba339f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Orc
-  data: {fileID: 11400000, guid: f10e9955600dab84aa59366a67cf6623, type: 2}
+  data: {fileID: 11400000, guid: 6bd977e5c0fc5f44da7317d7b0989f7b, type: 2}
   patrolPointLeft: {fileID: 8837781543647904240}
   patrolPointRight: {fileID: 3676282365897313780}
   spriteFacesRight: 1

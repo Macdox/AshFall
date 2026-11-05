@@ -13,7 +13,6 @@ public class PlayerHealth : MonoBehaviour,IDamageable
     public bool IsDead { get; private set; }
     private float i_frameTime = 0.5f;
     private float i_frameTimer;
-    [SerializeField] private float deadColliderGap = 0.3f;   // tune by eye
     public bool IsKnockedBack { get; private set; }
     private float knockbackDuration = 0.5f;
     private float knockbackTimer;

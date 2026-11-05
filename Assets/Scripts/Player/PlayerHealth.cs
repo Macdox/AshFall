@@ -7,7 +7,7 @@ public class PlayerHealth : MonoBehaviour,IDamageable
  
 
     private float maxHealth = 100f;
-    private float currentHealth;
+    private float currentHealth{ get; set; }
     private bool isInvincible;
     private bool isDashInvincible;
     public bool IsDead { get; private set; }
@@ -19,6 +19,7 @@ public class PlayerHealth : MonoBehaviour,IDamageable
     private float knockbackTimer;
 
     [SerializeField] private Animator anim;
+    private Collider2D playerCollider;
 
 
 
@@ -28,6 +29,7 @@ public class PlayerHealth : MonoBehaviour,IDamageable
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        playerCollider = GetComponent<Collider2D>();
         currentHealth = maxHealth;
     }
     
@@ -57,34 +59,62 @@ public class PlayerHealth : MonoBehaviour,IDamageable
     {
         isDashInvincible = value;
     }
-    
+
     public void TakeDamage(int damageAmount, Vector2 knockbackDir)
     {
-        if (isInvincible || isDashInvincible) return;
+        Debug.Log("Player TakeDamage called!");
+
+        if (isInvincible || isDashInvincible)
+        {
+            Debug.Log("Damage ignored due to invincibility.");
+            return;
+        }
 
         currentHealth -= damageAmount;
+
         isInvincible = true;
         i_frameTimer = i_frameTime;
+
         rb.AddForce(knockbackDir * 5f, ForceMode2D.Impulse);
+
         IsKnockedBack = true;
         knockbackTimer = knockbackDuration;
-        
+
+        Debug.Log($"Player damaged. Health: {currentHealth}");
+
         if (currentHealth <= 0)
         {
             currentHealth = 0;
             Die();
         }
     }
-    
+
     private void Die()
     {
         if (IsDead) return;
-        IsDead = true;
-        anim.SetTrigger("DeadTrigger");
-        rb.linearVelocity = Vector2.zero;
 
-        var col = GetComponent<BoxCollider2D>();   // Capsule has the same size/offset fields
-        col.size = new Vector2(col.size.x, col.size.y - deadColliderGap);
-        col.offset = new Vector2(col.offset.x, col.offset.y + deadColliderGap / 2f);
+        // Mark the player as dead first.
+        IsDead = true;
+
+        // Stop the player.
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
+
+        // Play death animation.
+        if (anim != null)
+        {
+            anim.SetTrigger("DeadTrigger");
+        }
+
+        // Disable the player's collider.
+        // This avoids accessing a missing BoxCollider2D.
+        if (playerCollider != null)
+        {
+            playerCollider.enabled = false;
+        }
+
+        Debug.Log("Player has died.");
     }
 }

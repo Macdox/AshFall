@@ -135,8 +135,9 @@ public class PlayerController : MonoBehaviour
         if (isDashing)
         {
             rb.linearVelocity = new Vector2(dashDirection * dashSpeed, 0f);
+
             dashTimer -= Time.fixedDeltaTime;
-            
+
             if (dashTimer <= 0f)
             {
                 isDashing = false;
@@ -145,22 +146,22 @@ public class PlayerController : MonoBehaviour
                 rb.gravityScale = defaultGravity;
             }
         }
+        else if (playerHealth != null && playerHealth.IsKnockedBack)
+        {
+            // Do not override Rigidbody2D knockback velocity.
+        }
         else
         {
-           
-            if (playerHealth == null || !playerHealth.IsKnockedBack)
+            Jump();
+
+            if (IsLanding())
             {
-                Jump();
-                if (IsLanding())
-                {
-                    // plant the feet: stop horizontal movement, keep vertical velocity
-                    rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-                    Anim.SetFloat("Speed", 0f);
-                }
-                else
-                {
-                    Move();
-                }
+                rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+                Anim.SetFloat("Speed", 0f);
+            }
+            else
+            {
+                Move();
             }
         }
     }

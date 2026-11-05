@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public enum EnemyState
@@ -8,5 +7,6 @@ public enum EnemyState
     Chase,
     Attack,
     Hurt,
-    Die
+    Die,
+    Return
 }

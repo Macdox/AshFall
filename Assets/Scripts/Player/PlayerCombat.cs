@@ -15,12 +15,15 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private Animator anim;
 
     private float nextAttackTime = 0f;
+
     private PlayerController playerController;
+    private PlayerHealth playerHealth;
 
     void Awake()
     {
         playerController = GetComponent<PlayerController>();
         anim = GetComponent<Animator>();
+        playerHealth = GetComponent<PlayerHealth>();
 
         // If enemyLayers is not set in inspector, default to hitting everything
         // (Useful for initial testing before proper layers are set up)
@@ -34,37 +37,84 @@ public class PlayerCombat : MonoBehaviour
     {
         if (Time.time >= nextAttackTime)
         {
-            if (Input.GetKeyDown(KeyCode.J) || Input.GetMouseButtonDown(0))
+            if (Input.GetKeyDown(KeyCode.J) || Input.GetMouseButtonDown(0) && !playerHealth.IsDead)
             {
                 anim.SetTrigger("AttackTrigger");   // only starts the body animation
                 nextAttackTime = Time.time + attackCooldown;
             }
+            return;
         }
     }
 
     // Called by an Animation Event on the strike frame
     public void DealAttack()
     {
-        Vector2 attackPos = (Vector2)transform.position + new Vector2(playerController.FacingDirection * 0.75f, 0f);
+        if (playerHealth == null || playerHealth.IsDead)
+            return;
 
-        // slash effect
-        attackEffectTransform.GetComponent<SpriteRenderer>().flipX = playerController.FacingDirection < 0;
-        attackEffectTransform.position = attackPos;
-        attackEffectTransform.GetComponent<SpriteRenderer>().enabled = true;
-        attackEffectAnimator.Play("Attack1_Effect", 0, 0f);
+        Vector2 attackPos = (Vector2)transform.position +
+            new Vector2(playerController.FacingDirection * 1.2f, 0f);
 
-        // hit detection (same code as before)
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPos, attackRange, enemyLayers);
+        // Play slash effect.
+        if (attackEffectTransform != null)
+        {
+            attackEffectTransform.position = attackPos;
+
+            SpriteRenderer effectRenderer =
+                attackEffectTransform.GetComponent<SpriteRenderer>();
+
+            if (effectRenderer != null)
+            {
+                effectRenderer.flipX =
+                    playerController.FacingDirection < 0;
+
+                effectRenderer.enabled = true;
+            }
+        }
+
+        if (attackEffectAnimator != null)
+        {
+            attackEffectAnimator.Play("Attack1_Effect", 0, 0f);
+        }
+
+        // Detect enemy colliders.
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
+            attackPos,
+            attackRange,
+            enemyLayers
+        );
+
+        Debug.Log("Attack detected colliders: " + hitEnemies.Length);
+
         foreach (Collider2D enemy in hitEnemies)
         {
-            if (enemy.gameObject == gameObject) continue;
+            // Ignore the player's own colliders.
+            if (enemy.transform.root == transform.root)
+                continue;
 
-            IDamageable damageable = enemy.GetComponent<IDamageable>();
-            if (damageable != null)
+            // Look for IDamageable on the collider or its parent.
+            IDamageable damageable =
+                enemy.GetComponentInParent<IDamageable>();
+
+            if (damageable == null)
             {
-                Vector2 knockbackDir = new Vector2(playerController.FacingDirection, 0f).normalized;
-                damageable.TakeDamage(attackDamage, knockbackDir);
+                Debug.LogWarning(
+                    "No IDamageable component found on: " + enemy.name
+                );
+                continue;
             }
+
+            Vector2 knockbackDir = new Vector2(
+                playerController.FacingDirection,
+                0f
+            );
+
+            damageable.TakeDamage(attackDamage, knockbackDir);
+
+            Debug.Log(
+                "Player dealt " + attackDamage +
+                " damage to " + enemy.name
+            );
         }
     }
 
@@ -74,7 +124,7 @@ public class PlayerCombat : MonoBehaviour
         PlayerController pc = GetComponent<PlayerController>();
         int facing = pc != null ? pc.FacingDirection : 1;
         
-        Vector2 attackPos = (Vector2)transform.position + new Vector2(facing * 0.75f, 0f);
+        Vector2 attackPos = (Vector2)transform.position + new Vector2(facing * 1.2f, 0f);
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPos, attackRange);
     }
